@@ -1,5 +1,6 @@
-import { memo, VFC } from "react";
+import { memo, FC } from "react";
 import { Select } from "@chakra-ui/react";
+import React from "react";
 
 type Props = {
   id: string;
@@ -8,7 +9,7 @@ type Props = {
   onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
 };
 
-export const FilteringSelect: VFC<Props> = memo((props) => {
+export const FilteringSelect: FC<Props> = memo((props) => {
   const { name, id, value, onChange } = props;
   const filterOptions = [
     { value: "all", label: "All" },

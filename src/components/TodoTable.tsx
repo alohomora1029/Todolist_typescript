@@ -1,4 +1,4 @@
-import { memo, VFC } from "react";
+import { memo, FC } from "react";
 import {
   TableContainer,
   Table,
@@ -10,6 +10,7 @@ import {
   Td,
   Button
 } from "@chakra-ui/react";
+import React from "react";
 
 type TodoType = {
   id: number;
@@ -26,7 +27,7 @@ type Props = {
   handleDeleteClick: (todoId: TodoType["id"]) => void;
 };
 
-export const TodoTable: VFC<Props> = memo((props) => {
+export const TodoTable:FC<Props> = memo((props) => {
   const { todos, handleEditClick, handleDeleteClick } = props;
 
   return (
