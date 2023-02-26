@@ -24,6 +24,7 @@ import { TodoTable } from "./components/TodoTable";
 import { FilteredTable } from "./components/FilteredTable";
 import { todosListState } from "./store/recoil/todosListState";
 import { progressFilterState } from "./store/recoil/progressFilterState";
+import React from "react";
 
 export const App: VFC = () => {
   const [todos, setTodos] = useRecoilState(todosListState);
