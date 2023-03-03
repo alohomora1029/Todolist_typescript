@@ -1,4 +1,4 @@
-import { useState, VFC, useEffect } from "react";
+import React, { useState, VFC, useEffect } from "react";
 import "./styles.css";
 import { Box, VStack } from "@chakra-ui/react";
 import { useRecoilState } from "recoil";
@@ -13,7 +13,7 @@ import {
   where,
   orderBy,
   updateDoc,
-  serverTimestamp
+  serverTimestamp,
 } from "firebase/firestore";
 
 import db from "./firebase";
@@ -24,7 +24,7 @@ import { TodoTable } from "./components/TodoTable";
 import { FilteredTable } from "./components/FilteredTable";
 import { todosListState } from "./store/recoil/todosListState";
 import { progressFilterState } from "./store/recoil/progressFilterState";
-import React from "react";
+import { Todo } from "./atoms/todoType";
 
 export const App: VFC = () => {
   const [todos, setTodos] = useRecoilState(todosListState);
@@ -34,7 +34,7 @@ export const App: VFC = () => {
     progress: "",
     detail: "",
     createddate: "",
-    updateddate: ""
+    updateddate: "",
   });
   const [isEditing, setIsEditing] = useState(false);
   const [currentTodo, setCurrentTodo] = useState({});
@@ -51,39 +51,38 @@ export const App: VFC = () => {
     const name = target.name;
     setTodo((prevState) => ({
       ...prevState,
-      [name]: value
+      [name]: value,
     }));
   };
 
   //追加　　配列
-  const handleAddFrom = (e) => {
+  const handleAddFrom = (e: React.ChangeEvent<HTMLSelectElement>) => {
     e.preventDefault();
-    console.log(e);
-    if (todo !== "") {
-      const add = {
-        id: todos.length + 1,
-        title: todo.title,
-        progress: todo.progress,
-        detail: todo.detail,
-        createddate: format(new Date(), "yyyy年M月d日"),
-        updateddate: todo.updateddate
-      };
-      addDoc(collection(db, "todos"), add);
-      setTodos([...todos, add]);
-    }
+    // if (todo !== "") {
+    const add = {
+      id: todos.length + 1,
+      title: todo.title,
+      progress: todo.progress,
+      detail: todo.detail,
+      createddate: format(new Date(), "yyyy年M月d日"),
+      updateddate: todo.updateddate,
+    };
+    addDoc(collection(db, "todos"), add);
+    setTodos([...todos, add]);
+    // }
     setTodo({
       id: 0,
       title: "",
       progress: "",
       detail: "",
       createddate: "",
-      updateddate: ""
+      updateddate: "",
     });
     setFilter("");
   };
 
   //削除
-  const handleDeleteClick = async (id) => {
+  const handleDeleteClick = async (id: unknown) => {
     const q = query(collection(db, "todos"), where("id", "==", id));
 
     const querySnapshot = await getDocs(q);
@@ -99,35 +98,49 @@ export const App: VFC = () => {
   };
 
   //編集
-  function handleEditInputChange(e) {
+  function handleEditInputChange(e: { target: { value: any } }) {
     setCurrentTodo({
       ...currentTodo,
-      title: e.target.value
+      title: e.target.value,
     });
   }
 
-  function handleEditSelectedInputChange(e) {
+  function handleEditSelectedInputChange(e: {
+    target: { selectedOptions: { textContent: any }[] };
+  }) {
     setCurrentTodo({
       ...currentTodo,
-      progress: e.target.selectedOptions[0].textContent
+      progress: e.target.selectedOptions[0].textContent,
     });
   }
 
-  function handleEditDetailInputChange(e) {
+  function handleEditDetailInputChange(e: { target: { value: any } }) {
     setCurrentTodo({
       ...currentTodo,
-      detail: e.target.value
+      detail: e.target.value,
     });
   }
 
-  function handleEditClick(todo) {
+  function handleEditClick(todo: React.SetStateAction<{}>) {
     setIsEditing(true);
-    setCurrentTodo({ ...todo });
+    setCurrentTodo({ ...todo});
   }
 
-  const handleUpdateTodo = async (id, updatedTodo) => {
-    const q = query(collection(db, "todos"), where("id", "==", id));
+  function handleEditFormSubmit(
+    e: { preventDefault: () => void; },
+    currentTodo: { id: number; }
+  ) {
+    // console.log(currentTodo);
+    e.preventDefault();
+    if (typeof currentTodo !== "undefined") {
+      return handleUpdateTodo(currentTodo.id, currentTodo);
+    } else {
+      console.log("this type is undefined");
+    }
+  }
 
+  const handleUpdateTodo = async (id: number, updatedTodo: any) => {
+    const q = query(collection(db, "todos"), where("id", "==", id));
     const querySnapshot = await getDocs(q);
     querySnapshot.forEach((ids) => {
       const documentID = ids.id;
@@ -135,7 +148,7 @@ export const App: VFC = () => {
 
       updateDoc(docRef, {
         ...updatedTodo,
-        updateddate: serverTimestamp()
+        updateddate: serverTimestamp(),
       });
 
       const postData = query(collection(db, "todos"), orderBy("id"));
@@ -149,7 +162,7 @@ export const App: VFC = () => {
           updateddate:
             doc.data().updateddate && typeof doc.data().updateddate === "object"
               ? format(doc.data().updateddate.toDate(), "yyyy年M月d日")
-              : ""
+              : "",
         }));
         setTodos(updatedItem);
       });
@@ -157,11 +170,9 @@ export const App: VFC = () => {
     setIsEditing(false);
   };
 
-  function handleEditFormSubmit(e) {
-    e.preventDefault();
-    handleUpdateTodo(currentTodo.id, currentTodo);
-  }
-  function handleSelectedProgress(e) {
+  function handleSelectedProgress(e: {
+    target: { value: string | ((currVal: string) => string) };
+  }) {
     setIsFilter(true);
     setFilter(e.target.value);
   }
@@ -179,7 +190,7 @@ export const App: VFC = () => {
         updateddate:
           doc.data().updateddate && typeof doc.data().updateddate === "object"
             ? format(doc.data().updateddate.toDate(), "yyyy年M月d日")
-            : ""
+            : "",
       }));
       setTodos(data);
       // console.log(data);

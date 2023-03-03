@@ -10,7 +10,7 @@ import {
 } from "@chakra-ui/react";
 import { ProgressSelect } from "../atoms/ProgressSelect";
 
-export const TodoForm = (props) => {
+export const TodoForm = (props: { handleAddFrom: any; todo: any; handleAddInputChange: any; }) => {
   const { handleAddFrom, todo, handleAddInputChange } = props;
   return (
     <>

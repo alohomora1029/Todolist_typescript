@@ -10,7 +10,7 @@ import {
 } from "@chakra-ui/react";
 import { ProgressSelect } from "../atoms/ProgressSelect";
 
-export const EditForm = (props) => {
+export const EditForm = (props: { currentTodo: any; onEditFormSubmit: any; onEditInputChange: any; onEditSelectedInputChange: any; onEditDetailInputChange: any; setIsEditing: any; }) => {
   const {
     currentTodo,
     onEditFormSubmit,
@@ -19,7 +19,6 @@ export const EditForm = (props) => {
     onEditDetailInputChange,
     setIsEditing
   } = props;
-
   return (
     <>
       <Flex
