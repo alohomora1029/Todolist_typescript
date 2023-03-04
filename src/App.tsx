@@ -25,6 +25,7 @@ import { FilteredTable } from "./components/FilteredTable";
 import { todosListState } from "./store/recoil/todosListState";
 import { progressFilterState } from "./store/recoil/progressFilterState";
 import { Todo } from "./atoms/todoType";
+import { id } from "date-fns/locale";
 
 export const App: VFC = () => {
   const [todos, setTodos] = useRecoilState(todosListState);
@@ -37,7 +38,7 @@ export const App: VFC = () => {
     updateddate: "",
   });
   const [isEditing, setIsEditing] = useState(false);
-  const [currentTodo, setCurrentTodo] = useState({});
+  const [currentTodo, setCurrentTodo] = useState<any>({});
   const [isfilter, setIsFilter] = useState(false);
   const [filter, setFilter] = useRecoilState(progressFilterState);
 
@@ -123,23 +124,10 @@ export const App: VFC = () => {
 
   function handleEditClick(todo: React.SetStateAction<{}>) {
     setIsEditing(true);
-    setCurrentTodo({ ...todo});
+    setCurrentTodo({ ...todo });
   }
 
-  function handleEditFormSubmit(
-    e: { preventDefault: () => void; },
-    currentTodo: { id: number; }
-  ) {
-    // console.log(currentTodo);
-    e.preventDefault();
-    if (typeof currentTodo !== "undefined") {
-      return handleUpdateTodo(currentTodo.id, currentTodo);
-    } else {
-      console.log("this type is undefined");
-    }
-  }
-
-  const handleUpdateTodo = async (id: number, updatedTodo: any) => {
+  const handleUpdateTodo = async (id: unknown, updatedTodo: any) => {
     const q = query(collection(db, "todos"), where("id", "==", id));
     const querySnapshot = await getDocs(q);
     querySnapshot.forEach((ids) => {
@@ -169,6 +157,17 @@ export const App: VFC = () => {
     });
     setIsEditing(false);
   };
+
+  function handleEditFormSubmit(e: { preventDefault: () => void }) {
+    e.preventDefault();
+    if (typeof currentTodo !== "undefined") {
+      console.log(currentTodo);
+      
+      return handleUpdateTodo(currentTodo.id, currentTodo);
+    } else {
+      console.log("this type is undefined");
+    }
+  }
 
   function handleSelectedProgress(e: {
     target: { value: string | ((currVal: string) => string) };
